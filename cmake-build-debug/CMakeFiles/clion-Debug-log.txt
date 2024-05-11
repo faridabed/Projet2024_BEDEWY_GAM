@@ -1,0 +1,4 @@
+"C:\Users\fbede\Desktop\CLion 2023.3.4\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Users/fbede/Desktop/CLion 2023.3.4/bin/ninja/win/x64/ninja.exe" -G Ninja -S C:\Users\fbede\CLionProjects\Projet2024_BEDEWY_GAM -B C:\Users\fbede\CLionProjects\Projet2024_BEDEWY_GAM\cmake-build-debug
+-- Configuring done (0.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: C:/Users/fbede/CLionProjects/Projet2024_BEDEWY_GAM/cmake-build-debug

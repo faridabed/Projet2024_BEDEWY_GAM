@@ -1,0 +1,3 @@
+C:/Users/fbede/CLionProjects/Projet2024_BEDEWY_GAM/cmake-build-debug/CMakeFiles/Projet2024_BEDEWY_GAM.dir
+C:/Users/fbede/CLionProjects/Projet2024_BEDEWY_GAM/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/fbede/CLionProjects/Projet2024_BEDEWY_GAM/cmake-build-debug/CMakeFiles/rebuild_cache.dir
