@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 // Définition des types de données pouvant être stockés dans les colonnes.
 typedef enum enum_type {
     NILVAL = 1, // Valeur nulle
