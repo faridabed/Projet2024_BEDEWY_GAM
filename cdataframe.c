@@ -131,3 +131,5 @@ unsigned int count_cells_meeting_condition(CDATAFRAME* df, int value, int (*cond
     }
     return count;
 }
+
+// Fonction

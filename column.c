@@ -1,7 +1,7 @@
 // column.c
 #include "column.h"
 
-
+//
 // Crée une nouvelle colonne
 COLUMN* create_column(ENUM_TYPE type, char* title) {
     COLUMN* col = (COLUMN*) malloc(sizeof(COLUMN));

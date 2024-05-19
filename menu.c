@@ -66,7 +66,7 @@ void column_menu(CDATAFRAME* df) {
         }
     }
 }
-
+// fonction menu
 void row_menu(CDATAFRAME* df) {
     int choice;
     while (1) {

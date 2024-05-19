@@ -4,7 +4,7 @@
 
 int main() {
 
-    menu();
+    menu(); // Fonction menu
     COLUMN* mycol = create_column(CHAR, "Ma Colonne");
     insert_value(mycol, "A");
     insert_value(mycol, "B");
