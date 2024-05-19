@@ -4,6 +4,110 @@
 
 #include "cdataframe.h"
 
+void add_row_to_dataframe(CDATAFRAME* df) {
+    if (df == NULL) {
+        printf("Erreur: DataFrame non initialise.\n");
+        return;
+    }
+
+    if (df->size == 0) {
+        printf("Erreur: Aucune colonne n'est presente dans le DataFrame. Veuillez d'abord creer une colonne.\n");
+        return;
+    }
+
+    void* values[df->size]; // Tableau pour stocker les adresses des valeurs à insérer
+
+
+    for (unsigned int i = 0; i < df->size; i++) {
+        COLUMN* col = df->columns[i];
+        printf("Insérer une valeur pour la colonne '%s' (Type %d):\n", col->title, col->column_type);
+
+        switch (col->column_type) {
+            case INT: {
+                int* value = (int*) malloc(sizeof(int));
+                printf("Entrez une valeur entiere: ");
+                scanf("%d", value);
+                values[i] = value;
+                break;
+            }
+            case FLOAT: {
+                float* value = (float*) malloc(sizeof(float));
+                printf("Entrez une valeur flottante: ");
+                scanf("%f", value);
+                values[i] = value;
+                break;
+            }
+            case CHAR: {
+                char* value = (char*) malloc(sizeof(char));
+                printf("Entrez un caractere: ");
+                scanf(" %c", value);  // L'espace avant %c consomme le newline
+                values[i] = value;
+                break;
+            }
+            case STRING: {
+                char* value = (char*) malloc(100 * sizeof(char));  // Taille fixe pour l'exemple
+                printf("Entrez une chaîne de caracteres: ");
+                scanf(" %99s", value);  // Protège contre les débordements de tampon
+                values[i] = value;
+                break;
+            }
+            default:
+                printf("Type non pris en charge pour l'ajout de valeurs.\n");
+                values[i] = NULL;
+        }
+    }
+
+
+    for (unsigned int i = 0; i < df->size; i++) {
+        if (values[i] != NULL) {
+            insert_value(df->columns[i], values[i]);
+            free(values[i]);  // Libérer la mémoire allouée pour chaque valeur
+        }
+    }
+}
+
+void insert_value_into_column(COLUMN* col) {
+    if (col == NULL) {
+        printf("Erreur : Aucune colonne selectionnee.\n");
+        return;
+    }
+
+    printf("Inserer une valeur dans la colonne de type '%s'.\n", col->title);
+
+    switch (col->column_type) {
+        case INT: {
+            int value;
+            printf("Entrez une valeur entiere : ");
+            scanf("%d", &value);
+            insert_value(col, &value);
+            break;
+        }
+        case FLOAT: {
+            float value;
+            printf("Entrez une valeur flottante : ");
+            scanf("%f", &value);
+            insert_value(col, &value);
+            break;
+        }
+        case CHAR: {
+            char value;
+            printf("Entrez un caractere : ");
+            scanf(" %c", &value);
+            insert_value(col, &value);
+            break;
+        }
+        case STRING: {
+            char value[100];
+            printf("Entrez une chaine de caracteres : ");
+            scanf(" %99s", value);
+            insert_value(col, value);
+            break;
+        }
+        default:
+            printf("Type non supporte pour l'insertion.\n");
+    }
+}
+
 void column_menu(CDATAFRAME* df) {
     int choice;
     while (1) {
@@ -36,15 +140,8 @@ void column_menu(CDATAFRAME* df) {
                 }
                 break;
             case 2:
-                if (df->columns == 0){
-                    printf("Aucune colonne n'a pas encore ete cree\n");
-                }
-                else{
-                    int d;
-                    printf("Saisir une valeur :\n");
-                    scanf("%d",&d);
-                    insert_value(df->columns,&d);
-                }
+                insert_value_into_column(col);
+                break;
             case 3:
                 printf("Entrez l'index de la colonne a supprimer: ");
                 scanf("%u", &index);
@@ -109,7 +206,7 @@ void row_menu(CDATAFRAME* df) {
                     }
                 }
                 if (add_row(df, row_data)) {
-                    printf("Ligne ajoutee avec succes.\n");
+                    printf("Ligne ajoutée avec succès.\n");
                 } else {
                     printf("Erreur lors de l'ajout de la ligne.\n");
                 }
@@ -119,10 +216,10 @@ void row_menu(CDATAFRAME* df) {
                 free(row_data);
                 break;
             case 2:
-                printf("Entrez l'index de la ligne a supprimer: ");
+                printf("Entrez l'index de la ligne à supprimer: ");
                 scanf("%u", &row_index);
                 remove_row(df, row_index);
-                printf("Ligne supprimee.\n");
+                printf("Ligne supprimée.\n");
                 break;
             case 3:
                 return;
@@ -176,12 +273,14 @@ void menu() {
         printf("\nMenu Principal:\n");
         printf("1. Gerer les colonnes\n");
         printf("2. Gerer les lignes\n");
-        printf("3. Afficher le DataFrame\n");
-        printf("4. Trouver une valeur\n");
-        printf("5. Compter les lignes\n");
-        printf("6. Compter les colonnes\n");
-        printf("7. Compter les cellules repondant a une condition\n");
-        printf("8. Quitter\n");
+        printf("3. Remplir en dur \n");
+        printf("4. Remplacer une valeur de cellule\n");
+        printf("5. Afficher le DataFrame\n");
+        printf("6. Trouver une valeur\n");
+        printf("7. Compter les lignes\n");
+        printf("8. Compter les colonnes\n");
+        printf("9. Compter les cellules repondant a une condition\n");
+        printf("10. Quitter\n");
         printf("Entrez votre choix: ");
         scanf("%d", &choice);
 
@@ -196,9 +295,48 @@ void menu() {
                 row_menu(df);
                 break;
             case 3:
+                fill_cdataframe_hardcoded(df);
+                break;
+                int col_index, row_index;
+            case 4:
+                printf("Choisisez l'index de la colonne et de la ligne que vous voulez remplacer: ");
+                scanf(" %d %d ", &col_index, &row_index);
+                switch (df->columns[col_index]->column_type) {
+                    case INT: {
+                        int new_value;
+                        printf("Entrez une valeur entiere : ");
+                        scanf("%d", &new_value);
+                        demo_replace_value(df, col_index,row_index, &new_value);
+                        break;
+                    }
+                    case FLOAT: {
+                        float new_value;
+                        printf("Entrez une valeur flottante : ");
+                        scanf("%f", &new_value);
+                        demo_replace_value(df, col_index,row_index, &new_value);
+                        break;
+                    }
+                    case CHAR: {
+                        char new_value;
+                        printf("Entrez un caractere : ");
+                        scanf(" %c", &new_value);
+                        demo_replace_value(df, col_index,row_index, &new_value);
+                        break;
+                    }
+                    case STRING: {
+                        char new_value[100];
+                        printf("Entrez une chaine de caracteres : ");
+                        scanf(" %99s", &new_value);
+                        demo_replace_value(df, col_index,row_index, &new_value);
+                        break;
+                    }
+                    default:
+                        printf("Type non supporte pour l'insertion.\n");
+                }
+            case 5:
                 display_menu(df);
                 break;
-            case 4:
+            case 6:
                 printf("Entrez la valeur a trouver (seulement pour les entiers): ");
                 scanf("%d", &int_value);
                 value = &int_value;
@@ -208,19 +346,19 @@ void menu() {
                     printf("Valeur non trouvee.\n");
                 }
                 break;
-            case 5:
+            case 7:
                 printf("Nombre de lignes: %u\n", count_rows(df));
                 break;
-            case 6:
+            case 8:
                 printf("Nombre de colonnes: %u\n", count_columns(df));
                 break;
-            case 7:
+            case 9:
                 printf("Entrez la valeur a comparer: ");
                 scanf("%d", &int_value);
                 //printf("Nombre de cellules répondant à la condition: %u\n", count_cells_meeting_condition(df, int_value, ?(int a, int b)  { return a == b; }));
                 printf("Bientot disponible\n");
                 break;
-            case 8:
+            case 10:
                 delete_cdataframe(&df);
                 return;
             default:

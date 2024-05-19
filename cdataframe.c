@@ -132,4 +132,74 @@ unsigned int count_cells_meeting_condition(CDATAFRAME* df, int value, int (*cond
     return count;
 }
 
-// Fonction
+void fill_cdataframe_hardcoded(CDATAFRAME* df) {
+    if (df == NULL) {
+        printf("Erreur: DataFrame non initialisé.\n");
+        return;
+    }
+
+    // Créer et ajouter des colonnes de différents types
+    COLUMN* col_int = create_column(INT, "Age");
+    COLUMN* col_float = create_column(FLOAT, "Taille");
+    COLUMN* col_char = create_column(CHAR, "Initiale");
+    COLUMN* col_string = create_column(STRING, "Nom");
+
+    add_column(df, col_int);
+    add_column(df, col_float);
+    add_column(df, col_char);
+    add_column(df, col_string);
+
+    // Données prédéfinies à insérer
+    int ages[] = {25, 30, 35};
+    float tailles[] = {1.75f, 1.80f, 1.85f};
+    char initiales[] = {'A', 'B', 'C'};
+    char* noms[] = {"Alice", "Bob", "Charlie"};
+
+    // Insertion des données dans chaque colonne
+    for (int i = 0; i < 3; i++) {
+        insert_value(col_int, &ages[i]);
+        insert_value(col_float, &tailles[i]);
+        insert_value(col_char, &initiales[i]);
+        insert_value(col_string, noms[i]);
+    }
+}
+
+// Remplace la valeur dans une colonne spécifique à un index donné
+void replace_value_in_column(COLUMN* col, unsigned int index, void* new_value) {
+    if (col == NULL) {
+        printf("Erreur: La colonne n'est pas initialisée.\n");
+        return;
+    }
+    if (index >= col->size) {
+        printf("Erreur: Index hors limites.\n");
+        return;
+    }
+
+    switch (col->column_type) {
+        case INT:
+            col->data[index].int_value = *(int*)new_value;
+            break;
+        case FLOAT:
+            col->data[index].float_value = *(float*)new_value;
+            break;
+        case CHAR:
+            col->data[index].char_value = *(char*)new_value;
+            break;
+        case STRING:
+            free(col->data[index].string_value); // Libérer la mémoire de l'ancienne chaîne
+            col->data[index].string_value = strdup((char*)new_value);
+            break;
+        default:
+            printf("Type non supporté pour le remplacement.\n");
+    }
+}
+
+// Fonction d'aide pour démontrer l'utilisation
+void demo_replace_value(CDATAFRAME* df, unsigned int col_index, unsigned int row_index, void* new_value) {
+    if (df == NULL || col_index >= df->size) {
+        printf("Erreur: DataFrame non initialisé ou index de colonne invalide.\n");
+        return;
+    }
+
+    replace_value_in_column(df->columns[col_index], row_index, new_value);
+}

@@ -22,5 +22,8 @@ void display_column_names(CDATAFRAME* df); // Afficher les noms des colonnes
 int find_value(CDATAFRAME* df, void* value); // Trouver une valeur dans le DataFrame
 unsigned int count_rows(CDATAFRAME* df);
 unsigned int count_columns(CDATAFRAME* df);
+void fill_cdataframe_hardcoded(CDATAFRAME* df);
+void replace_value_in_column(COLUMN* col, unsigned int index, void* new_value);
+void demo_replace_value(CDATAFRAME* df, unsigned int col_index, unsigned int row_index, void* new_value);
 unsigned int count_cells_meeting_condition(CDATAFRAME* df, int value, int (*condition)(int, int)); // fonction problematique
 #endif //PROJET2024_BEDEWY_GAM_CDATAFRAME_H
