@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Crée un nouveau DataFrame vide.
 CDATAFRAME* create_cdataframe() {
     CDATAFRAME* df = (CDATAFRAME*) malloc(sizeof(CDATAFRAME));
     if (!df) return NULL;
@@ -13,6 +14,7 @@ CDATAFRAME* create_cdataframe() {
     return df;
 }
 
+// Supprime un DataFrame, libérant toutes les ressources associées.
 void delete_cdataframe(CDATAFRAME** df) {
     if (!df || !*df) return;
     for (unsigned int i = 0; i < (*df)->size; i++) {
@@ -23,12 +25,14 @@ void delete_cdataframe(CDATAFRAME** df) {
     *df = NULL;
 }
 
+// Affiche le contenu complet du DataFrame.
 void display_cdataframe(CDATAFRAME* df) {
     for (unsigned int i = 0; i < df->size; i++) {
         print_col(df->columns[i]);
     }
 }
 
+// Ajoute une colonne au DataFrame, ajustant la taille si nécessaire.
 int add_column(CDATAFRAME* df, COLUMN* col) {
     if (df->size >= df->capacity) {
         df->capacity = (df->capacity == 0) ? 1 : df->capacity * 2;
@@ -40,6 +44,7 @@ int add_column(CDATAFRAME* df, COLUMN* col) {
     return 1;
 }
 
+// Supprime une colonne du DataFrame.
 void remove_column(CDATAFRAME* df, unsigned int index) {
     if (index >= df->size) return;
     delete_column(&df->columns[index]);
@@ -49,21 +54,24 @@ void remove_column(CDATAFRAME* df, unsigned int index) {
     df->size--;
 }
 
+// Ajoute une ligne de données au DataFrame.
 int add_row(CDATAFRAME* df, void** row_data) {
     for (unsigned int i = 0; i < df->size; i++) {
         if (!insert_value(df->columns[i], row_data[i])) {
-            return 0;  // Handle rollback or continue as needed
+            return 0;
         }
     }
     return 1;
 }
 
+// Supprime une ligne de données du DataFrame.
 void remove_row(CDATAFRAME* df, unsigned int row_index) {
     for (unsigned int i = 0; i < df->size; i++) {
         remove_value(df->columns[i], row_index);
     }
 }
 
+// Renomme une colonne dans le DataFrame.
 void rename_column(CDATAFRAME* df, unsigned int col_index, char* new_name) {
     if (col_index < df->size) {
         free(df->columns[col_index]->title);
@@ -71,6 +79,7 @@ void rename_column(CDATAFRAME* df, unsigned int col_index, char* new_name) {
     }
 }
 
+// Affiche une partie spécifique du DataFrame.
 void display_partial_dataframe(CDATAFRAME* df, unsigned int start_row, unsigned int num_rows) {
     printf("Partial Display of DataFrame starting at row %d for %d rows:\n", start_row, num_rows);
     for (unsigned int i = 0; i < df->size; i++) {
@@ -83,6 +92,7 @@ void display_partial_dataframe(CDATAFRAME* df, unsigned int start_row, unsigned 
     }
 }
 
+// Affiche les noms de toutes les colonnes du DataFrame.
 void display_column_names(CDATAFRAME* df) {
     printf("Column Names:\n");
     for (unsigned int i = 0; i < df->size; i++) {
@@ -90,6 +100,7 @@ void display_column_names(CDATAFRAME* df) {
     }
 }
 
+// Recherche une valeur spécifique dans le DataFrame.
 int find_value(CDATAFRAME* df, void* value) {
     for (unsigned int i = 0; i < df->size; i++) {
         for (unsigned int j = 0; j < df->columns[i]->size; j++) {
@@ -103,59 +114,45 @@ int find_value(CDATAFRAME* df, void* value) {
     return 0;
 }
 
-// Compter les lignes dans le CDataframe
+// Compte le nombre de lignes dans le DataFrame.
 unsigned int count_rows(CDATAFRAME* df) {
     if (df->size == 0) return 0;
-    return df->columns[0]->size; // Supposant que toutes les colonnes ont le même nombre de lignes
+    return df->columns[0]->size;
 }
 
-// Compter les colonnes dans le CDataframe
+// Compte le nombre de colonnes dans le DataFrame.
 unsigned int count_columns(CDATAFRAME* df) {
     return df->size;
 }
 
-// Fonction pour compter les cellules répondant à une condition spécifique
+// Compte les cellules qui répondent à une condition spécifique.
 unsigned int count_cells_meeting_condition(CDATAFRAME* df, int value, int (*condition)(int, int)) {
     unsigned int count = 0;
     for (unsigned int i = 0; i < df->size; i++) {
         for (unsigned int j = 0; j < df->columns[i]->size; j++) {
-            int cell_value;
-            // On suppose que nous comparons des entiers ici
-            if (df->columns[i]->column_type == INT) {
-                cell_value = df->columns[i]->data[j].int_value;
-                if (condition(cell_value, value)) {
-                    count++;
-                }
+            int cell_value = df->columns[i]->data[j].int_value;
+            if (condition(cell_value, value)) {
+                count++;
             }
         }
     }
     return count;
 }
 
+// Remplit le DataFrame avec des données prédéfinies.
 void fill_cdataframe_hardcoded(CDATAFRAME* df) {
-    if (df == NULL) {
-        printf("Erreur: DataFrame non initialisé.\n");
-        return;
-    }
-
-    // Créer et ajouter des colonnes de différents types
     COLUMN* col_int = create_column(INT, "Age");
     COLUMN* col_float = create_column(FLOAT, "Taille");
     COLUMN* col_char = create_column(CHAR, "Initiale");
     COLUMN* col_string = create_column(STRING, "Nom");
-
     add_column(df, col_int);
     add_column(df, col_float);
     add_column(df, col_char);
     add_column(df, col_string);
-
-    // Données prédéfinies à insérer
     int ages[] = {25, 30, 35};
     float tailles[] = {1.75f, 1.80f, 1.85f};
     char initiales[] = {'A', 'B', 'C'};
     char* noms[] = {"Alice", "Bob", "Charlie"};
-
-    // Insertion des données dans chaque colonne
     for (int i = 0; i < 3; i++) {
         insert_value(col_int, &ages[i]);
         insert_value(col_float, &tailles[i]);
@@ -164,7 +161,7 @@ void fill_cdataframe_hardcoded(CDATAFRAME* df) {
     }
 }
 
-// Remplace la valeur dans une colonne spécifique à un index donné
+// Remplace la valeur dans une colonne spécifique à un index donné.
 void replace_value_in_column(COLUMN* col, unsigned int index, void* new_value) {
     if (col == NULL) {
         printf("Erreur: La colonne n'est pas initialisée.\n");
@@ -174,7 +171,6 @@ void replace_value_in_column(COLUMN* col, unsigned int index, void* new_value) {
         printf("Erreur: Index hors limites.\n");
         return;
     }
-
     switch (col->column_type) {
         case INT:
             col->data[index].int_value = *(int*)new_value;
@@ -186,7 +182,7 @@ void replace_value_in_column(COLUMN* col, unsigned int index, void* new_value) {
             col->data[index].char_value = *(char*)new_value;
             break;
         case STRING:
-            free(col->data[index].string_value); // Libérer la mémoire de l'ancienne chaîne
+            free(col->data[index].string_value);
             col->data[index].string_value = strdup((char*)new_value);
             break;
         default:
@@ -194,12 +190,11 @@ void replace_value_in_column(COLUMN* col, unsigned int index, void* new_value) {
     }
 }
 
-// Fonction d'aide pour démontrer l'utilisation
+// Démonstration du remplacement d'une valeur spécifique dans une colonne du DataFrame.
 void demo_replace_value(CDATAFRAME* df, unsigned int col_index, unsigned int row_index, void* new_value) {
     if (df == NULL || col_index >= df->size) {
         printf("Erreur: DataFrame non initialisé ou index de colonne invalide.\n");
         return;
     }
-
     replace_value_in_column(df->columns[col_index], row_index, new_value);
 }

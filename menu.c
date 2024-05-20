@@ -20,7 +20,7 @@ void add_row_to_dataframe(CDATAFRAME* df) {
 
     for (unsigned int i = 0; i < df->size; i++) {
         COLUMN* col = df->columns[i];
-        printf("Insérer une valeur pour la colonne '%s' (Type %d):\n", col->title, col->column_type);
+        printf("Inserer une valeur pour la colonne '%s' (Type %d):\n", col->title, col->column_type);
 
         switch (col->column_type) {
             case INT: {
@@ -46,7 +46,7 @@ void add_row_to_dataframe(CDATAFRAME* df) {
             }
             case STRING: {
                 char* value = (char*) malloc(100 * sizeof(char));  // Taille fixe pour l'exemple
-                printf("Entrez une chaîne de caracteres: ");
+                printf("Entrez une chaine de caracteres: ");
                 scanf(" %99s", value);  // Protège contre les débordements de tampon
                 values[i] = value;
                 break;
@@ -206,7 +206,7 @@ void row_menu(CDATAFRAME* df) {
                     }
                 }
                 if (add_row(df, row_data)) {
-                    printf("Ligne ajoutée avec succès.\n");
+                    printf("Ligne ajoutee avec succes.\n");
                 } else {
                     printf("Erreur lors de l'ajout de la ligne.\n");
                 }
@@ -216,10 +216,10 @@ void row_menu(CDATAFRAME* df) {
                 free(row_data);
                 break;
             case 2:
-                printf("Entrez l'index de la ligne à supprimer: ");
+                printf("Entrez l'index de la ligne a supprimer: ");
                 scanf("%u", &row_index);
                 remove_row(df, row_index);
-                printf("Ligne supprimée.\n");
+                printf("Ligne supprimee.\n");
                 break;
             case 3:
                 return;

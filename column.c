@@ -1,28 +1,27 @@
-// column.c
 #include "column.h"
 
-//
-// Crée une nouvelle colonne
+
+// Crée une colonne en allouant la mémoire nécessaire et initialise ses attributs.
 COLUMN* create_column(ENUM_TYPE type, char* title) {
     COLUMN* col = (COLUMN*) malloc(sizeof(COLUMN));
-    if (col == NULL) return NULL;
-    col->title = strdup(title); // Allocation de memoire pour chaine de caractere
+    if (col == NULL) return NULL;  // Vérifie l'échec de l'allocation
+    col->title = strdup(title); // Duplique le titre pour gestion propre de la mémoire
     col->size = 0;
-    col->max_size = 256;  // Taille physique initiale
+    col->max_size = 256;  // Définit la taille initiale de la colonne
     col->column_type = type;
     col->data = (COL_TYPE*) calloc(col->max_size, sizeof(COL_TYPE));
-    col->index = NULL;
+    col->index = NULL;  // Initialement, aucun index n'est utilisé
     return col;
 }
 
-// Insère une valeur dans la colonne
+// Insère une valeur dans une colonne en gérant le type et la capacité.
 int insert_value(COLUMN* col, void* value) {
     if (col->size >= col->max_size) {
-        // Réallouer plus d'espace
-        col->max_size += 256;
+        col->max_size += 256; // Augmente la capacité si nécessaire
         col->data = (COL_TYPE*) realloc(col->data, col->max_size * sizeof(COL_TYPE));
-        if (col->data == NULL) return 0;
+        if (col->data == NULL) return 0;  // Gère l'échec de realloc
     }
+    // Insertion basée sur le type de données
     switch (col->column_type) {
         case INT:
             col->data[col->size].int_value = *(int*) value;
@@ -37,7 +36,7 @@ int insert_value(COLUMN* col, void* value) {
             col->data[col->size].double_value = *(double*) value;
             break;
         case STRING:
-            col->data[col->size].string_value = strdup((char*) value);
+            col->data[col->size].string_value = strdup((char*) value);  // Duplique la chaîne
             break;
         case STRUCTURE:
         case NILVAL:
@@ -48,11 +47,12 @@ int insert_value(COLUMN* col, void* value) {
     return 1;
 }
 
-// Supprime une colonne et libère la mémoire allouée
+
+// Supprime une colonne, libérant la mémoire pour toutes les données stockées.
 void delete_column(COLUMN** col) {
     if ((*col)->column_type == STRING) {
         for (unsigned int i = 0; i < (*col)->size; i++) {
-            free((*col)->data[i].string_value);
+            free((*col)->data[i].string_value);  // Libère chaque chaîne individuellement
         }
     }
     free((*col)->data);
@@ -61,7 +61,8 @@ void delete_column(COLUMN** col) {
     *col = NULL;
 }
 
-// Affiche le contenu de la colonne
+
+// Affiche toutes les valeurs d'une colonne.
 void print_col(COLUMN* col) {
     printf("Colonne : %s\n", col->title);
     for (unsigned int i = 0; i < col->size; i++) {
@@ -71,7 +72,7 @@ void print_col(COLUMN* col) {
     }
 }
 
-// Convertit une valeur de la colonne en chaîne de caractères
+// Convertit et formatte une valeur de la colonne pour l'affichage.
 void convert_value(COLUMN* col, unsigned long long int i, char* str, size_t size) {
     switch (col->column_type) {
         case INT:
@@ -89,11 +90,22 @@ void convert_value(COLUMN* col, unsigned long long int i, char* str, size_t size
     }
 }
 
+// Supprime une valeur d'une colonne en décalant les éléments restants.
 void remove_value(COLUMN* col, unsigned int index) {
-    if (index >= col->size) return; // Vérifier que l'index est valide
+    if (index >= col->size) {
+        printf("Erreur : Index hors limites.\n");
+        return; // Vérifier que l'index est valide avant de continuer
+    }
+
+    // Si la colonne stocke des chaînes de caractères, libère la mémoire allouée
+    if (col->column_type == STRING) {
+        free(col->data[index].string_value);
+    }
+
     // Déplacer tous les éléments après l'index vers la gauche pour supprimer l'élément
     for (unsigned int i = index; i < col->size - 1; i++) {
         col->data[i] = col->data[i + 1];
     }
-    col->size--; // Réduire la taille logique de la colonne
+
+    col->size--; // Réduire la taille logique de la colonne après la suppression
 }
