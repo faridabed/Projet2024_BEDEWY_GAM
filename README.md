@@ -3,6 +3,8 @@ Réalisé par :
 Farida Bedewy
 Dissi Gam
 
+Lien du projet : https://github.com/faridabed/Projet2024_BEDEWY_GAM.git
+
 Ce projet C implémente une bibliothèque pour la manipulation de structures de données de type dataframe, permettant de réaliser des opérations de base similaires à celles du package pandas en Python.
 
   - Colonnes de tous types de données
